@@ -28,7 +28,8 @@ export default class Welcome extends Component {
                 </sub>
               </div>
               <div>
-                <input type="text" value={this.state.value} />
+                  <h3>Please enter your personal API key to continue.</h3>
+                <input type="text" placeholder="Key..." value={this.state.value} />
                 <NavLink to="/game">
                     <button onclick={this.useKey}>
                         <p>Begin The Game</p>
