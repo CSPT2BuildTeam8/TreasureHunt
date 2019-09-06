@@ -3,6 +3,7 @@ import { withRouter, Switch, Route } from "react-router-dom";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import Welcome from "./components/welcomePage/Welcome";
+import Game from "./components/game/Game";
 
 import "./App.css";
 
@@ -20,6 +21,7 @@ const App = ({ location }) => {
       >
         <Switch location={location}>
           <Route exact path="/" component={Welcome} />
+          <Route path="/game" component={Game} />
         </Switch>
       </CSSTransition>
     </TransitionGroup>
