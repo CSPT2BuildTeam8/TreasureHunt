@@ -5,6 +5,7 @@ import styled from "styled-components";
 import MapBody from "./Map";
 import RoomInfo from "./RoomInfo";
 import PlayerInfo from "./PlayerInfo";
+import Footer from "./Footer";
 
 const GameBody = styled.div`
   display: flex;
@@ -44,6 +45,7 @@ export default class Welcome extends Component {
                   <PlayerInfo />
                 </InfoWrap>
               </MapWrap>
+              <Footer />
             </GameBody>
         )
     }
