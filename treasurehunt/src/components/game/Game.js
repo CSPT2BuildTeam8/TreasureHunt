@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import styled from "styled-components";
 
-import MapBody from "./Map";
+import Map from "./Map";
 import RoomInfo from "./RoomInfo";
 import PlayerInfo from "./PlayerInfo";
 import Footer from "./Footer";
@@ -39,7 +39,7 @@ export default class Welcome extends Component {
                 <H1>Treasure Hunt</H1>    
               </Header>  
               <MapWrap>
-                <MapBody />
+                <Map />
                 <InfoWrap>
                   <RoomInfo />
                   <PlayerInfo />
