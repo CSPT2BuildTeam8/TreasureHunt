@@ -1,9 +1,16 @@
 import React, { Component } from "react";
 
+import CardBack from "../images/info_background.jpg";
+
 import styled from "styled-components";
 
 const PlayerInfoBody = styled.div`
-  background: #703500;
+  background-image: url(${CardBack});
+  background-size: 100% 100%;
+  height: 40vh;
+  margin: 2% 6%;
+  border-radius: 8px;
+  box-shadow: 0px 10px 5px black;
 `
 const H1 = styled.h1`
   font-size: 1.8rem;
