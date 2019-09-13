@@ -16,6 +16,87 @@ let encumbrance = 0
 let gold = 0
 let inventory = []
 
+//Function to Sell Items
+
+sellTreasure = async name => {
+    try {
+      const res = await axios({
+        method: 'post',
+        url: 'https://lambda-treasure-hunt.herokuapp.com/api/adv/sell/',
+        headers: {
+          Authorization: process.env.API_KEY
+        },
+        data: {
+          name,
+          confirm: 'yes'
+        }
+      });
+      console.log(res);
+      this.setState({
+        messages: [...res.data.messages],
+        cooldown: res.data.cooldown
+      });
+      await this.wait(1000 * res.data.cooldown);
+    } catch (err) {
+      console.log('There was an error.');
+      console.dir(err);
+      this.setState({ cooldown: err.response.data.cooldown });
+      throw new Error(err.response.data.errors[0]);
+    }
+  };
+
+  // Sell all treasure by looping through them
+  sellAllTreasure = async () => {
+    const { inventory } = this.state;
+    for (let treasure of inventory) {
+      await this.sellTreasure(treasure);
+    }
+    await this.getStatus();
+  };
+
+  
+  //Get Quickest path to node 
+  findQuickestPath = (start = this.state.room_id, target = '?') => {
+    let { graph } = this.state;
+    let queue = [];
+    let visited = new Set();
+    for (let room in graph[start][1]) {
+      queue = [...queue, [{ [room]: graph[start][1][room] }]];
+    }
+
+    while (queue.length) {
+      let dequeued = queue.shift();
+
+      let last_room = dequeued[dequeued.length - 1];
+
+      for (let exit in last_room) {
+        if (last_room[exit] === target) {
+          if (target === '?') {
+            dequeued.pop();
+          }
+          dequeued.forEach(item => {
+            for (let key in item) {
+              graph[item[key]][0].color = '#9A4F53';
+            }
+          });
+          return dequeued;
+        } else {
+          visited.add(last_room[exit]);
+
+          for (let path in graph[last_room[exit]][1]) {
+            if (visited.has(graph[last_room[exit]][1][path]) === false) {
+              let path_copy = Array.from(dequeued);
+              path_copy.push({ [path]: graph[last_room[exit]][1][path] });
+
+              queue.push(path_copy);
+            }
+          }
+        }
+      }
+    }
+    return 'That target is incorrect.';
+  };
+
 //Chooses a random direction based of available exits in current room
 randomDirection= (obj) => {
     var keys = Object.keys(obj)
@@ -112,7 +193,15 @@ adventure = () => {
             })
         }, coolDown * 1000)
     } else {
-        //go to store
+        // Function that takes you to the store
+        goToStore = async () => {
+            const path = this.findQuickestPath(this.state.room_id, 1)
+            for (let direction of path) {
+                for (let d in direction) {
+                    await this.flyToRooms(d, direction[d]);
+        }
+    }
+}
     }
 
 }
