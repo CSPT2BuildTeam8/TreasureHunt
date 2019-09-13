@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
+import AboutBack from "../images/about_background.jpg";
+import AboutCard from "../images/about_card.jpg";
+
 import styled from "styled-components";
 
 const WelcomeBody = styled.div`
@@ -11,67 +14,51 @@ const WelcomeBody = styled.div`
   text-align: center;
   width: 100%;
   height: 100vh;
-  background: -moz-linear-gradient(330deg, rgba(46,255,70,1) 0%, rgba(0,128,128,1) 100%); /* ff3.6+ */
-  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(46,255,70,1)), color-stop(100%, rgba(0,128,128,1))); /* safari4+,chrome */
-  background: -webkit-linear-gradient(330deg, rgba(46,255,70,1) 0%, rgba(0,128,128,1) 100%); /* safari5.1+,chrome10+ */
-  background: -o-linear-gradient(330deg, rgba(46,255,70,1) 0%, rgba(0,128,128,1) 100%); /* opera 11.10+ */
-  background: -ms-linear-gradient(330deg, rgba(46,255,70,1) 0%, rgba(0,128,128,1) 100%); /* ie10+ */
-  background: linear-gradient(120deg, rgba(46,255,70,1) 0%, rgba(0,128,128,1) 100%); /* w3c */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2EFF46', endColorstr='#008080',GradientType=1 ); /* ie6-9 */
+  background-image: url(${AboutBack});
+  background-size: cover;
 `
 const Card = styled.div`
   padding: 3%;
-  background: #D68511;
   width: 75%;
+  background-image: url(${AboutCard});
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   border-radius: 8px;
-  border-top: double 7px black;
-  border-bottom: double 7px black;
-  border-left: 3px solid black;
-  border-right: 3px solid black;
-  -webkit-box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
-  box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 10px 5px black;
 `
 const H1 = styled.h1`
+  text-shadow: 3px 3px 3px black;
+  color: #e5e5e5;
   font-size: 2.4rem;
   margin-bottom: 5%;
   font-weight: bold;
 `
 const H2 = styled.h2`
+  text-shadow: 3px 3px 3px black;
+  color: #e5e5e5;
   font-size: 1.8rem;
   margin: 1.5%;
 `
 const Sub = styled.sub`
+  text-shadow: 3px 3px 3px black;
+  color: #e5e5e5;
   font-size: 1rem;
-  padding: 0 9%;
+  padding: 0.5% 9%;
+  background: #703500;
   -webkit-appearance: textarea;
   line-height: 1.5;
 `
-const Input = styled.input`
-  width: 50%;
-  height: 30px;
-  border-radius: 8px;
-  padding-left: 1%;
-  margin-right: 1%;
-  border: none;
-`
 const Button = styled.button`
-  height: 32px;
+  height: 37px;
+  width: 10%;
   border-radius: 8px;
   border: none;
   background: #703500;
   color: white;
+  margin-top: 3%;
 `
 
-export default class Welcome extends Component {
-    constructor() {
-      super()
-      this.state = {value: '',}
-    }
-    useKey = (e) =>{
-        this.setState({value: e.target.value})
-    }  
-    
+export default class Welcome extends Component {      
     render() {
         return (
           <WelcomeBody>
@@ -86,12 +73,8 @@ export default class Welcome extends Component {
                     except maybe that one where you wander around catching little anime monsters and force them 
                     to fight for your amusement and personal gain. You know the one I mean. 
                 </Sub>
-              </Card>
-              <Card>
-                  <H2>Please enter your personal API key to continue.</H2>
-                <Input type="text" placeholder="Key..." value={this.state.value} />
                 <NavLink to="/game">
-                    <Button onclick={this.useKey}>
+                    <Button>
                         <p>Begin The Game</p>
                     </Button>
                 </NavLink>
