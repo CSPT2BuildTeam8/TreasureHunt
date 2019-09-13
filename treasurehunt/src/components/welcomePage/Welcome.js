@@ -52,10 +52,15 @@ const Button = styled.button`
   height: 37px;
   width: 10%;
   border-radius: 8px;
-  border: none;
   background: #703500;
   color: white;
   margin-top: 3%;
+  &:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari prior 9.0 */
+    transform: scale(1.5); /* Standard syntax */
+  }
 `
 
 export default class Welcome extends Component {      
