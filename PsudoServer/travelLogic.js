@@ -234,3 +234,6 @@ adventure = () => {
 setTimeout(() => {
   adventure();
 }, coolDown * 1000);
+
+
+
