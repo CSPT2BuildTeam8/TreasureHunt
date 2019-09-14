@@ -16,6 +16,9 @@ let encumbrance = 0
 let gold = 0
 let inventory = []
 
+
+//Global Functions 
+
 //Function to Sell Items
 
 sellTreasure = name => {
@@ -24,35 +27,35 @@ sellTreasure = name => {
     .then(() =>{
         console.log(res.data)
         coolDown = res.data.cooldown
+        sellAllTreasure()
     })
     .catch(err =>{
         console.log(err.response)
-        coolDown = err.response.data.cooldown
+        //coolDown = err.response.data.cooldown
     })
 };
 
   // Sell all treasure by looping through them
 sellAllTreasure = () => {
-    const items = items;
-    for (let treasure of items) {
+    console.log(inventory)
+    if(inventory.length) {
         setTimeout(() => {
-            sellTreasure(treasure)
+            sellTreasure(inventory[0])
         }, coolDown * 1000);
-        sellTreasure(treasure);
+    } else{
+        console.log("no more treasure")
     }
 
 };
 
-  
-  //Get Quickest path to node 
+
+  //Get Quickest path to target room
 findQuickestPath = (start = currentRoom.room_id, target = '?') => {
-    console.log("maybe in here")
     let graph = mapData;
     let queue = [];
     let visited = new Set();
     for (let room in graph[start]) {
         queue = [...queue, [{ [room]: graph[start][room] }]];
-        console.log(queue)
     }
 
     while (queue.length) {
@@ -65,11 +68,6 @@ findQuickestPath = (start = currentRoom.room_id, target = '?') => {
             if (target === '?') {
             dequeued.pop();
             }
-            // dequeued.forEach(item => {
-            // for (let key in item) {
-            //     graph[item[key]][0].color = '#9A4F53';
-            //  }
-            // });
             return dequeued;
         } else {
             visited.add(last_room[exit]);
@@ -88,40 +86,68 @@ findQuickestPath = (start = currentRoom.room_id, target = '?') => {
     return 'That target is incorrect.';
 };
 
+
+//get to the store 
 goToStore = () => {
-    console.log("now here?")
     const path = findQuickestPath(currentRoom.room_id, 1)
     setTimeout(() => {
         console.log(coolDown)
-        followPath(path)
+        followPath(path, 1)
     }, coolDown * 1000);
     
 }
 
-followPath = (path) =>{
-    console.log(path)
-    for (let direction of path) {
-        //console.log(direction)
-        for (let d in direction) {
-            coolDown = 10
-            setTimeout(() => {
-                console.log(coolDown)
-                console.log(d)
-                console.log(direction[d])
-                console.log("traveling to store")
-                // treasureHunt.post("move", { "direction":d, "next_room_id": direction[d].toString() })
-                // .then(res => {
-                // coolDown = res.data.cooldown
-                // currentRoom = res.data
-                // console.log(res.data)
-                // })
-                // .catch(err =>{
-                //     console.log(err.response)
-                //     coolDown = err.response.data.cooldown
-                // })
-            }, coolDown * 1000);
+
+//follow a path 
+let count = 0
+followPath = (path, target) =>{
+    if(currentRoom.room_id === target){
+        console.log("in target room")
+        if(target === 1){
+            sellAllTreasure()
         }
+    } else {
+        direction = Object.keys(path[count])[0]
+        nextRoom = Object.values(path[count])[0]
+        console.log(direction, nextRoom)
+        console.log(count)
+
+        setTimeout(() => {
+            treasureHunt
+            .get("init")
+            .then(res => {
+            currentRoom = res.data;
+            coolDown = currentRoom.cooldown;
+            console.log("you are in room", currentRoom.room_id)
+            
+                console.log("here")
+                setTimeout(() => {
+                    console.log("traveling to room", target)
+                    treasureHunt.post("move", { "direction":  Object.keys(path[count])[0] , "next_room_id": Object.values(path[count])[0].toString } )
+                    .then(res => {
+                    coolDown = res.data.cooldown
+                    currentRoom = res.data
+                    console.log(res.data)
+                    count++
+                    setTimeout(() => {
+                        followPath(path, target)
+                    }, coolDown * 1000);
+                    })
+                    .catch(err =>{
+                        console.log(err.response)
+                        coolDown = err.response.data.cooldown
+                    })
+                }, coolDown * 1000);
+                
+            })
+            .catch(err => {console.error(err)});
+        }, coolDown * 1000);
+
+
+        console.log(currentRoom.room_id, target)
+
     }
+
 }
 
 //Chooses a random direction based of available exits in current room
@@ -131,20 +157,15 @@ randomDirection= (obj) => {
 };
 
 
+//Initialize to get stats 
+
 init = () =>{
     treasureHunt
     .get("init")
     .then(res => {
     console.log("init: ", res.data);
 
-      // Set the current_room to res.data
     currentRoom = res.data;
-
-      // Print out the current room ID and the exits
-      //console.log("Room ID: ", currentRoom.room_id);
-      //console.log("Room exits: ", currentRoom.exits);
-
-      // Set the cool down period to whatever it is in the current room
     coolDown = currentRoom.cooldown;
     randDirection = randomDirection(mapData[currentRoom.room_id])
     })
@@ -160,13 +181,24 @@ init = () =>{
         encumbrance = status.encumbrance
         gold = status.gold
         inventory = status.inventory
+        //If you need to drop an item
+        // setTimeout(() => {
+        //     treasureHunt
+        //     .post("drop", {"name":status.inventory[0]})
+        //     .then(res => {
+        //     console.log(res.data);
+        //     })
+        //     .catch(err => console.error(err.response));
+        // }, coolDown * 1000);
+    
         })
         .catch(err => console.error(err.response));
     }, coolDown * 1000);
     
-
-
+    
 }
+
+//adventure to pick up treasure and go to store until you have 1000 gold
 
 adventure =  async() => {
 
@@ -224,17 +256,16 @@ adventure =  async() => {
         }, coolDown * 1000)
     } else {
         // Function that takes you to the store
-        console.log("here")
         setTimeout(() => {
-            console.log("maybe")
             goToStore()
         }, coolDown * 1000);
         
         }
-    }
+}
 
 
 init()
+
 setTimeout(() =>{
     adventure()
 }, coolDown * 1000)
