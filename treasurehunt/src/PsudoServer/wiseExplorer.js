@@ -16,6 +16,9 @@ let encumbrance = 0
 let gold = 0
 let inventory = []
 
+//Store location
+let room_id = null
+
 //Function to Sell Items
 
 sellTreasure = async name => {
@@ -199,9 +202,9 @@ adventure = () => {
             for (let direction of path) {
                 for (let d in direction) {
                     await this.flyToRooms(d, direction[d]);
+                }
+            }
         }
-    }
-}
     }
 
 }
