@@ -89,10 +89,10 @@ findQuickestPath = (start = currentRoom.room_id, target = '?') => {
 
 //get to the store 
 goToStore = () => {
-    const path = findQuickestPath(currentRoom.room_id, 1)
+    const path = findQuickestPath(currentRoom.room_id, 250)
     setTimeout(() => {
         console.log(coolDown)
-        followPath(path, 1)
+        followPath(path, 250)
     }, coolDown * 1000);
     
 }
@@ -217,7 +217,7 @@ adventure =  async() => {
     .catch(err => console.error(err.response));
     
     //if encumbrance is less than strength use wise explorer and search for treasure
-    if(encumbrance < strength -2 ){
+    if(encumbrance < strength -9 ){
         //set a random direction of travel and get the next room based of mapData
         randDirection = randomDirection(mapData[currentRoom.room_id])
         var nextRoom = mapData[currentRoom.room_id][randDirection]
