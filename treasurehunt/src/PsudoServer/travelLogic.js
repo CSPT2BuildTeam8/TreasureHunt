@@ -2,13 +2,12 @@ const treasureHunt = require("./axiosConfig");
 const move = require("./graphLogic");
 var fs = require("fs");
 
-console.log(process.env)
-
 // Create empty arrays and list to hold map and paths
 let traversalPath = [];
 let reversePath = [];
 let map = {};
 let graphLogic = {};
+let name_changed = false;
 
 // Create a variable for the current room
 let currentRoom = null;
@@ -158,27 +157,43 @@ adventure = () => {
 
         graphLogic[new_room_id] = currentRoom;
 
-        // Write out the current graph to graphData.json (updates every move)
-        fs.writeFile(
-          "./graphData.json",
-          JSON.stringify(graphLogic, null, 2),
-          "utf-8",
-          function(err, result) {
-            if (err) console.log("error", err);
-          }
-        );
+        //Write out the current graph to graphData.json (updates every move)
+        // fs.writeFile(
+        //   "./graphData.json",
+        //   JSON.stringify(graphLogic, null, 2),
+        //   "utf-8",
+        //   function(err, result) {
+        //     if (err) console.log("error", err);
+        //   }
+        // );
 
-        // Write out the current map to mapData.json (updates every move)
-        fs.writeFile(
-          "./mapData.json",
-          JSON.stringify(map, null, 2),
-          "utf-8",
-          function(err, result) {
-            if (err) console.log("error", err);
-          }
-        );
+        // // Write out the current map to mapData.json (updates every move)
+        // fs.writeFile(
+        //   "./mapData.json",
+        //   JSON.stringify(map, null, 2),
+        //   "utf-8",
+        //   function(err, result) {
+        //     if (err) console.log("error", err);
+        //   }
+        // );
 
-        console.log("Finished writing map and graph data to disk.");
+        // console.log("Finished writing map and graph data to disk.");
+
+         // Check if the currrent room allows you to change names
+        if (currentRoom.room_id === 467 && !name_changed) {
+          setTimeout(() => {
+          treasureHunt
+            .post("change_name", {
+            name: "James Hutton",
+            confirm: "aye"
+          })
+            .then(res => {
+            coolDown = res.data.cooldown;
+            name_changed = true;
+          })
+          .catch(err => console.log("Error changing names: ", err, currentRoom));
+    }, coolDown * 1000);
+  }
 
         // Set the cooldown to the current room's cool down length
         coolDown = res.data.cooldown;
@@ -234,3 +249,6 @@ adventure = () => {
 setTimeout(() => {
   adventure();
 }, coolDown * 1000);
+
+
+

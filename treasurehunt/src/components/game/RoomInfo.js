@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import room_data from "../../PsudoServer/data.json";
+import map_data from "../../PsudoServer/mapData.json";
 
 import styled from "styled-components";
 
@@ -21,20 +23,12 @@ const H2 = styled.h2`
 `
 
 export default class RoomInfo extends Component {
-    constructor() {
-        super()
-        this.state = {
-            roomID: '',
-            roomName: '',
-            roomDesc: '',
-            items: '',
-            players: '',
-        }
-    }
     render() {
         return(
             <RoomInfoBody>
-              <H1>Room {this.props.roomID}</H1>  
+              <H1>Room: 
+              {/* {room_data}{''} */}
+              </H1>  
               <H1>{this.props.roomName}</H1>
               <H2>{this.props.roomDesc}</H2>
               <H1>Items</H1>
