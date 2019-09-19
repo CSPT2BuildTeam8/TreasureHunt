@@ -1,4 +1,4 @@
-const map = require("../treasurehunt/src/components/game/data");
+const map = require("./mapData.json");
 
 const dfs = (current_room_id, target_room_id) => {
   // Return a list containing a path from

@@ -1,14 +1,14 @@
 const treasureHunt = require("./axiosConfig");
 const move = require("./graphLogic");
-var fs = require("fs");
-
-console.log(process.env)
+// var fs = require("fs");
+const getLastProof = require("../PsudoServer/blockchain");
 
 // Create empty arrays and list to hold map and paths
 let traversalPath = [];
 let reversePath = [];
 let map = {};
-let graphLogic = {};
+let graph = {};
+let name_changed = false;
 
 // Create a variable for the current room
 let currentRoom = null;
@@ -50,52 +50,61 @@ treasureHunt
   .catch(err => console.error(err));
 
 // This function will hold all of the actual logic for moving through
-// the map and should continue until map.length==500
+// the map, picking things up, selling things, etc. and should continue
+// until map.length==500
 adventure = () => {
   let room_ID = currentRoom.room_id;
-  let unexplored_rooms = [];
+  // let unexplored_rooms = [];
 
-  // Create a helper function to move between rooms and pause for cool down
-  // This uses the move() function from graphLogic.js to move between the current and target room
-  const toRoom = (current_room_id, target_room_id) => {
-    const directions = move(current_room_id, target_room_id);
+  console.log("Currently in room:", currentRoom.room_id);
+  // console.log("with:", currentRoom.items);
 
-    directions.forEach(direction => {
-      setTimeout(() => {
-        treasureHunt.post("move", { direction }).then(res => {
-          coolDown = res.data.coolDown;
-          currentRoom = res.data;
-        });
-      }, coolDown * 1000);
-    });
-  };
-
-  //   Check if the current room is in the map object, and if not, add it
-  if (!map[room_ID]) {
-    map[room_ID] = {};
+  if (room_ID === 250) {
+    getLastProof();
   }
+};
 
-  console.log("The map length is now: ", Object.keys(map).length);
+  // // Create a helper function to move between rooms and pause for cool down
+  // // This uses the move() function from graphLogic.js to move between the current and target room
+  // const toRoom = (current_room_id, target_room_id) => {
+  //   const directions = move(current_room_id, target_room_id);
+
+  //   directions.forEach(direction => {
+  //     setTimeout(() => {
+  //       treasureHunt.post("move", { direction }).then(res => {
+  //         coolDown = res.data.coolDown;
+  //         currentRoom = res.data;
+  //       });
+  //     }, coolDown * 1000);
+  //   });
+  // };
+
+  // //   Check if the current room is in the map object, and if not, add it
+  // if (!map[room_ID]) {
+  //   map[room_ID] = {};
+  // }
+
+  // console.log("The map length is now: ", Object.keys(map).length);
 
   //   Add unexplored exits to the map with a X
-  currentRoom.exits.forEach(exit => {
-    if (map[room_ID][exit.toString()] == undefined) {
-      map[room_ID][exit.toString()] = "?";
-    }
-  });
+  // currentRoom.exits.forEach(exit => {
+  //   if (map[room_ID][exit.toString()] == undefined) {
+  //     map[room_ID][exit.toString()] = "?";
+  //   }
+  // });
 
-  graphLogic[room_ID] = currentRoom;
+  // graphLogic[room_ID] = currentRoom;
 
-  console.log("The graph length is now: ", Object.keys(graphLogic).length);
+  // console.log("The graph length is now: ", Object.keys(graphLogic).length);
 
   //   Create array of unexplored rooms
-  for (var key in map[room_ID]) {
-    if (map[room_ID][key] == "?") {
-      unexplored_rooms.push(key);
-    }
-  }
+  // for (var key in map[room_ID]) {
+  //   if (map[room_ID][key] == "?") {
+  //     unexplored_rooms.push(key);
+  //   }
+  // }
 
-  console.log("The remaining unexplored rooms are:\n", unexplored_rooms);
+  // console.log("The remaining unexplored rooms are:\n", unexplored_rooms);
 
   /* 
   The following conditional will handle:
@@ -109,125 +118,141 @@ adventure = () => {
   TODO: Add in the logic that picks up treasure, etc.
   */
 
-  if (unexplored_rooms.length > 0) {
-    console.log("Can explore");
-    // Pick a room from the unexplored_rooms array
-    let move_forward = unexplored_rooms[0];
-    unexplored_rooms = [];
+  // if (unexplored_rooms.length > 0) {
+  //   console.log("Can explore");
+  //   // Pick a room from the unexplored_rooms array
+  //   let move_forward = unexplored_rooms[0];
+  //   unexplored_rooms = [];
 
-    // Add the next move to the traversalPath array
-    traversalPath.push(move_forward);
+  //   // Add the next move to the traversalPath array
+  //   traversalPath.push(move_forward);
 
-    // Add the opposite direction move to the reversePath array
-    let reverse_move = reverse(move_forward);
-    reversePath.push(reverse_move);
+  //   // Add the opposite direction move to the reversePath array
+  //   let reverse_move = reverse(move_forward);
+  //   reversePath.push(reverse_move);
 
-    /*
-    Use setTimeout and POST('move') to move to the next room
-    Add the new room_id to the map
-    Add the exits to the map
-    Add the opposite direction move to the map
-    Change cool down to current room cool down
-    */
-    setTimeout(() => {
-      treasureHunt.post("move", { direction: move_forward }).then(res => {
-        // Save room_id to previous_room_id and set new currentRoom
-        let previous_room_id = room_ID;
-        currentRoom = res.data;
+  //   /*
+  //   Use setTimeout and POST('move') to move to the next room
+  //   Add the new room_id to the map
+  //   Add the exits to the map
+  //   Add the opposite direction move to the map
+  //   Change cool down to current room cool down
+  //   */
+  //   setTimeout(() => {
+  //     treasureHunt.post("move", { direction: move_forward }).then(res => {
+  //       // Save room_id to previous_room_id and set new currentRoom
+  //       let previous_room_id = room_ID;
+  //       currentRoom = res.data;
 
-        // Update the map with the path forward from the previous room
-        map[previous_room_id][move_forward] = currentRoom.room_id;
+  //       // Update the map with the path forward from the previous room
+  //       map[previous_room_id][move_forward] = currentRoom.room_id;
 
-        // Set a new room_id
-        let new_room_id = currentRoom.room_id;
+  //       // Set a new room_id
+  //       let new_room_id = currentRoom.room_id;
 
-        // Check if the new_room_id is in the map object, and if not, add it
-        if (!map[new_room_id]) {
-          map[new_room_id] = {};
-        }
+  //       // Check if the new_room_id is in the map object, and if not, add it
+  //       if (!map[new_room_id]) {
+  //         map[new_room_id] = {};
+  //       }
 
-        // Add unexplored exits for the new room to the map with a X
-        currentRoom.exits.forEach(exit => {
-          if (map[new_room_id][exit.toString()] == undefined) {
-            map[new_room_id][exit.toString()] = "?";
-          }
-        });
+  //       // Add unexplored exits for the new room to the map with a X
+  //       currentRoom.exits.forEach(exit => {
+  //         if (map[new_room_id][exit.toString()] == undefined) {
+  //           map[new_room_id][exit.toString()] = "?";
+  //         }
+  //       });
 
-        // Update new rooms reverse_move room with the previous_room_id
-        map[new_room_id][reverse_move] = previous_room_id;
+  //       // Update new rooms reverse_move room with the previous_room_id
+  //       map[new_room_id][reverse_move] = previous_room_id;
 
-        graphLogic[new_room_id] = currentRoom;
+  //       graphLogic[new_room_id] = currentRoom;
 
-        // Write out the current graph to graphData.json (updates every move)
-        fs.writeFile(
-          "./graphData.json",
-          JSON.stringify(graphLogic, null, 2),
-          "utf-8",
-          function(err, result) {
-            if (err) console.log("error", err);
-          }
-        );
+  //       //Write out the current graph to graphData.json (updates every move)
+  //       // fs.writeFile(
+  //       //   "./graphData.json",
+  //       //   JSON.stringify(graphLogic, null, 2),
+  //       //   "utf-8",
+  //       //   function(err, result) {
+  //       //     if (err) console.log("error", err);
+  //       //   }
+  //       // );
 
-        // Write out the current map to mapData.json (updates every move)
-        fs.writeFile(
-          "./mapData.json",
-          JSON.stringify(map, null, 2),
-          "utf-8",
-          function(err, result) {
-            if (err) console.log("error", err);
-          }
-        );
+  //       // // Write out the current map to mapData.json (updates every move)
+  //       // fs.writeFile(
+  //       //   "./mapData.json",
+  //       //   JSON.stringify(map, null, 2),
+  //       //   "utf-8",
+  //       //   function(err, result) {
+  //       //     if (err) console.log("error", err);
+  //       //   }
+  //       // );
 
-        console.log("Finished writing map and graph data to disk.");
+  //       // console.log("Finished writing map and graph data to disk.");
 
-        // Set the cooldown to the current room's cool down length
-        coolDown = res.data.cooldown;
+  //        // Check if the currrent room allows you to change names
+  //       if (currentRoom.room_id === 467 && !name_changed) {
+  //         setTimeout(() => {
+  //         treasureHunt
+  //           .post("change_name", {
+  //           name: "James Hutton",
+  //           confirm: "aye"
+  //         })
+  //           .then(res => {
+  //           coolDown = res.data.cooldown;
+  //           name_changed = true;
+  //         })
+  //         .catch(err => console.log("Error changing names: ", err, currentRoom));
+  //   }, coolDown * 1000);
+  // }
 
-        if (Object.keys(map).length !== 500) {
-          setTimeout(() => {
-            adventure();
-          }, coolDown * 1000);
-        }
-      });
-    });
+  //       // Set the cooldown to the current room's cool down length
+  //       coolDown = res.data.cooldown;
 
-    // Check if map.length == 500 and if not, loop through adventure() again
-  } else if (unexplored_rooms.length == 0 && reversePath.length) {
-    console.log("Can not go that way");
-    // Get last move from reversePath array
-    let reversed_path = reversePath.pop();
+  //       if (Object.keys(map).length !== 500) {
+  //         setTimeout(() => {
+  //           adventure();
+  //         }, coolDown * 1000);
+  //       }
+  //     });
+  //   });
 
-    // Add the reversed move to the traversalPath
-    traversalPath.push(reversed_path);
+  //   // Check if map.length == 500 and if not, loop through adventure() again
+  // } else if (unexplored_rooms.length == 0 && reversePath.length) {
+  //   console.log("Can not go that way");
+  //   // Get last move from reversePath array
+  //   let reversed_path = reversePath.pop();
 
-    // Use setTimeout and POST('move') to move to the reversed room
-    setTimeout(() => {
-      treasureHunt
-        .post("move", { direction: reversed_path })
-        .then(res => {
-          currentRoom = res.data;
-          coolDown = res.data.cooldown;
-          console.log("Currently in room ", currentRoom.room_id);
+  //   // Add the reversed move to the traversalPath
+  //   traversalPath.push(reversed_path);
 
-          if (Object.keys(map).length !== 500) {
-            setTimeout(() => {
-              adventure();
-            }, coolDown * 1000);
-          }
-        })
-        .catch(err =>
-          console.log("There was a problem reversing out of a dead end: ", err)
-        );
-    });
-  } else if (unexplored_rooms.length == 0 && reversePath.length == 0) {
-    console.log(
-      "Map Complete! The map length is: ",
-      Object.keys(map).length
-    );
+//     // Use setTimeout and POST('move') to move to the reversed room
+//     setTimeout(() => {
+//       treasureHunt
+//         .post("move", { direction: reversed_path })
+//         .then(res => {
+//           currentRoom = res.data;
+//           coolDown = res.data.cooldown;
+//           console.log("Currently in room ", currentRoom.room_id);
 
-    return map;
-  }
-};
+//           if (Object.keys(map).length !== 500) {
+//             setTimeout(() => {
+//               adventure();
+//             }, coolDown * 1000);
+//           }
+//         })
+//         .catch(err =>
+//           console.log("There was a problem reversing out of a dead end: ", err)
+//         );
+//     });
+//   } else if (unexplored_rooms.length == 0 && reversePath.length == 0) {
+//     console.log(
+//       "Map Complete! The map length is: ",
+//       Object.keys(map).length
+//     );
+
+//     return map;
+//   }
+// };
 
 // Run the adventure function (while will continue till map.length==500)
 // while waiting the correct amount of time between each move
