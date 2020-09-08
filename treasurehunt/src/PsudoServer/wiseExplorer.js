@@ -16,8 +16,13 @@ let encumbrance = 0
 let gold = 0
 let inventory = []
 
+<<<<<<< HEAD
+//Store location
+let room_id = null
+=======
 
 //Global Functions 
+>>>>>>> ce97f7c51a1c5f33b54c273453079c3f5317c249
 
 //Function to Sell Items
 
@@ -256,12 +261,24 @@ adventure =  async() => {
         }, coolDown * 1000)
     } else {
         // Function that takes you to the store
+<<<<<<< HEAD
+        goToStore = async () => {
+            const path = this.findQuickestPath(this.state.room_id, 1)
+            for (let direction of path) {
+                for (let d in direction) {
+                    await this.flyToRooms(d, direction[d]);
+                }
+            }
+        }
+    }
+=======
         setTimeout(() => {
             goToStore()
         }, coolDown * 1000);
         
         }
 }
+>>>>>>> ce97f7c51a1c5f33b54c273453079c3f5317c249
 
 
 init()
